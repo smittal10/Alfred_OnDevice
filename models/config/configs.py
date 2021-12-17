@@ -87,6 +87,11 @@ def Config(parser):
     parser.add_argument('--gpu', help='use gpu', action='store_true')
     parser.add_argument('--fast_epoch', action='store_true', help='fast epoch during debugging')
     parser.add_argument('--debug', dest='debug', action='store_true')
+    parser.add_argument('--eval_path', type=str,default='exp', help='fine-tuned model checkpoint directory')
+    parser.add_argument('--ckpt_name',type=str, default="model_best_seen.pth", help='model file name')
+    parser.add_argument('--freeze_embeddings', help='freeze_embeddings', action='store_true' )
+    parser.add_argument('--freeze_layers', help='freeze layers', action='store_true' )
+    parser.add_argument('--small_emb_dim', default=128, type=int, help='small word embedding size')
 
     # model_structure_parameters = [
     #     'enc_layer_num', 'head_num', 'hidden_dim', 'emb_dim', 'train_level', 'low_data', 'inner_dim',

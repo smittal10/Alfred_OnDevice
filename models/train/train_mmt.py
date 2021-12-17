@@ -224,19 +224,19 @@ if __name__ == '__main__':
     if args.train_level != 'low':
         train_high = AlfredPyTorchDataset(alfred_data, 'train', 'high', args)
         train_loader_high = torch.utils.data.DataLoader(train_high,
-            batch_size=args.batch, shuffle=True, num_workers=2, pin_memory=True)
+            batch_size=args.batch, shuffle=True, num_workers=4, pin_memory=True)
         train_loaders['high'] = train_loader_high
 
     if args.train_level != 'high' and args.low_data != 'mani':
         train_low_navi = AlfredPyTorchDataset(alfred_data, 'train', 'low_navi', args)
         train_loader_low_navi = torch.utils.data.DataLoader(train_low_navi,
-            batch_size=args.batch, shuffle=True, num_workers=2, pin_memory=True)
+            batch_size=args.batch, shuffle=True, num_workers=4, pin_memory=True)
         train_loaders['low_navi'] = train_loader_low_navi
 
     if args.train_level != 'high' and args.low_data != 'navi':
         train_low_mani = AlfredPyTorchDataset(alfred_data, 'train', 'low_mani', args)
         train_loader_low_mani = torch.utils.data.DataLoader(train_low_mani,
-            batch_size=args.batch, shuffle=True, num_workers=2, pin_memory=True)
+            batch_size=args.batch, shuffle=True, num_workers=4, pin_memory=True)
         train_loaders['low_mani'] = train_loader_low_mani
 
 
@@ -253,11 +253,38 @@ if __name__ == '__main__':
             # bs = 400 if args.train_proportion != 100 else args.batch
             valid_set = AlfredPyTorchDataset(alfred_data, split, tt, args)
             valid_loaders[split+'-'+tt] = torch.utils.data.DataLoader(valid_set,
-                batch_size=bs, shuffle=True, num_workers=2, pin_memory=True)
+                batch_size=bs, shuffle=True, num_workers=4, pin_memory=True)
 
     # setup model
     model = MultiModalTransformer(args, alfred_data)
+    #load model from checkpoint
+    ckpt_path = os.path.join(args.eval_path, args.ckpt_name)
+    ckpt = torch.load(ckpt_path, map_location=model.device)
+    model.load_state_dict(ckpt, strict=False)
+    layer_list = model.encoder.encoder.layer
+    # embed_list = list(model.encoder.embeddin
+    # layer_indexes = [11,10,9,8,7,6]
+    # layer_indexes.sort(reverse=True)
+    # for layer_idx in layer_indexes:
+    #     del(layer_list[layer_idx])
+    #     print ("Removed Layer: ", layer_idx)
+    # model.encoder.config.num_hidden_layers = len(layer_list)
+
+    if args.freeze_embeddings:
+        for param in embed_list:
+            param.requires_grad = False
+            print ("Froze Embedding Layer")
+    
+    if args.freeze_layers:
+        layer_indexes = [0,1,2,3,4,5]
+        for layer_idx in layer_indexes:
+            for param in list(layer_list[layer_idx].parameters()):
+                param.requires_grad = False
+            print ("Froze Layer: ", layer_idx)
+
     model.to(model.device)
+    # print(model)
+    # sys.exit()
 
     # learnable weights for multiple loss terms
     log_var = None

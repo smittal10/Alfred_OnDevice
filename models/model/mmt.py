@@ -33,8 +33,11 @@ class MultiModalTransformer(nn.Module):
             'arg': self.dataset.dec_out_vocab_arg,
         }
         self.can_navi = args.train_level !='high' and args.low_data != 'mani'
+        print(args.gpu)
         self.device = torch.device('cuda') if args.gpu else torch.device('cpu')
+        print(self.device)
         self.seq_len = self.args.max_enc_length
+        self.small_emb_dim = args.small_emb_dim
         self.emb_dim = args.emb_dim
         self.image_size = self.args.image_size
         self.vis_len = args.topk_objs + 1
@@ -127,8 +130,28 @@ class MultiModalTransformer(nn.Module):
 
         else:
             self.encoder = get_bert_model(args)
-            self.word_emb = self.encoder.embeddings.word_embeddings
-            scale =torch.std(self.word_emb.weight[:1000]).item()
+            layer_list = self.encoder.encoder.layer
+            bert_vocab_size = self.encoder.embeddings.word_embeddings.weight.shape[0]
+            print("bert vocab size {}".format(bert_vocab_size))
+            scale =torch.std(self.encoder.embeddings.word_embeddings.weight[:1000]).item()
+            del(self.encoder.embeddings.word_embeddings)
+            # embed_list = list(self.encoder.embeddings.named_parameters())
+            # print("Embed list: ", embed_list)
+            # sys.exit()
+            layer_indexes = [11,10,9,8,7,6]
+            layer_indexes.sort(reverse=True)
+            for layer_idx in layer_indexes:
+                del(layer_list[layer_idx])
+                print ("Removed Layer: ", layer_idx)
+            self.encoder.config.num_hidden_layers = len(layer_list)
+            # print(self.encoder)
+            #original embedding
+            # self.word_emb = self.encoder.embeddings.word_embeddings
+            #factorized embedding
+            tok_embed1 = nn.Embedding(bert_vocab_size, self.small_emb_dim)
+            tok_embed2 = nn.Linear(self.small_emb_dim, self.emb_dim)
+            self.word_emb = nn.Sequential(tok_embed1,tok_embed2)
+            # scale =torch.std(self.word_emb.weight[:1000]).item()
             self.action_emb = SpecialEmbedding(args, self.word_emb,
                 self.vocab, self.action_vocab, self.bert_tknz)
             self.vis_feat_to_emb = nn.Sequential(
@@ -585,10 +608,3 @@ class MultiModalTransformer(nn.Module):
         action_seq[:actual_len] = self.totensor(action_history_seq[-actual_len:])
         # logging.info(action_seq)
         return action_seq   # his_len
-
-
-
-
-
-
-

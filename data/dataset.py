@@ -94,6 +94,9 @@ class AlfredPyTorchDataset(torch.utils.data.Dataset):
 
 
         print('%s: %s action data instance: #%d'%(self.split, self.level, len(self)))
+        print('debugging mode on')
+        # if self.split == 'valid':
+        #     return self.dataset[:16]
         return self.dataset
 
     def __len__(self):

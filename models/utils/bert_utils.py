@@ -2,7 +2,7 @@ from gen.constants import *
 from transformers import BertConfig, BertModel, BertTokenizer
 from transformers import MobileBertConfig, MobileBertModel, MobileBertTokenizer
 from transformers import AlbertConfig, AlbertModel, AlbertTokenizer
-from transformers import RobertaConfig, RobertaModel, RobertaTokenizer
+from transformers import AutoConfig,RobertaConfig, RobertaModel,AutoModel, RobertaTokenizer
 
 ckpt = {
         "bert": 'bert-base-uncased',
@@ -37,7 +37,9 @@ def get_bert_model(args):
         "albert": AlbertModel,
         "roberta": RobertaModel,
         }[args.bert_model]
-    return model.from_pretrained(ckpt[args.bert_model])
+    config = AutoConfig.from_pretrained(ckpt[args.bert_model])
+    return AutoModel.from_config(config)
+    # return model.from_pretrained(ckpt[args.bert_model])
 
 
 def get_bert_tknz(args):
