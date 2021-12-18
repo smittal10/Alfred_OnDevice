@@ -3,3 +3,10 @@ data/json_*
 __pycache__/
 core.*
 *.tar.gz
+*.csv
+*.zip
+*.pth
+temp/
+runs/
+tb_log/
+data/
