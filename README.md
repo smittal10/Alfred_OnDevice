@@ -26,7 +26,7 @@ $ export ALFRED_ROOT=$(pwd)
 ## Evaluation
 Run the following command to evaluate our HiTUT model on the validation sets. "--max_high_fails 9" corresponds to a maximum allowed backtracking number of 8. 
 ```bash
-python models/train/eval_valid_mmt.py --eval_path exp/Jan27-roberta-mix/noskip_lr_mix_all_E-xavier768d_L12_H768_det-sep_dp0.1_di0.1_step_lr5e-05_0.999_type_sd999 --ckpt model_best_seen.pth --gpu --max_high_fails 9 --max_fails 10 --eval_split valid_seen --eval_enable_feat_posture --num_threads 4 --name_temp eval_valid_seen
+python models/train/eval_mmt_valid.py --eval_path exp/Jan27-roberta-mix/noskip_lr_mix_all_E-xavier768d_L12_H768_det-sep_dp0.1_di0.1_step_lr5e-05_0.999_type_sd999 --ckpt model_best_seen.pth --gpu --max_high_fails 9 --max_fails 10 --eval_split valid_seen --eval_enable_feat_posture --num_threads 4 --name_temp eval_valid_seen
 python models/eval/eval_mmt.py --eval_path exp/Jan27-roberta-mix/noskip_lr_mix_all_E-xavier768d_L12_H768_det-sep_dp0.1_di0.1_step_lr5e-05_0.999_type_sd999 --ckpt model_best_seen.pth --gpu --max_high_fails 9 --max_fails 10 --eval_split valid_unseen --eval_enable_feat_posture --num_threads 4 --name_temp eval_valid_unseen
 ```
 
