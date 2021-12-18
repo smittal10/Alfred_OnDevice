@@ -1,6 +1,6 @@
-# HiTUT
+# HiTUT (On-device)
 
-Official code for the ACL 2021 Findings paper "Yichi Zhang and Joyce Chai. Hierarchical Task Learning from Language Instructions with Unified Transformers and Self-Monitoring" [[arXiv](https://arxiv.org/abs/2106.03427)].
+This repo contains code for model reduction techniques on the original HiTUT model to make it run on Jetson Nano 2GB. It is an extension of official code for the ACL 2021 Findings paper "Yichi Zhang and Joyce Chai. Hierarchical Task Learning from Language Instructions with Unified Transformers and Self-Monitoring" [[arXiv](https://arxiv.org/abs/2106.03427)].
 
 
 ## Requirements
@@ -12,6 +12,7 @@ $ pip install -r requirements.txt
 
 
 Download the raw trajectory data, the preprocessed data, the pretrained Mask-RCNN models and our trained HiTUT model. 
+TODO: Add the link for the compressed model soon
 ```bash
 $ sh download.sh
 ```
@@ -25,13 +26,8 @@ $ export ALFRED_ROOT=$(pwd)
 ## Evaluation
 Run the following command to evaluate our HiTUT model on the validation sets. "--max_high_fails 9" corresponds to a maximum allowed backtracking number of 8. 
 ```bash
-python models/eval/eval_mmt.py --eval_path exp/Jan27-roberta-mix/noskip_lr_mix_all_E-xavier768d_L12_H768_det-sep_dp0.1_di0.1_step_lr5e-05_0.999_type_sd999 --ckpt model_best_seen.pth --gpu --max_high_fails 9 --max_fails 10 --eval_split valid_seen --eval_enable_feat_posture --num_threads 4 --name_temp eval_valid_seen
+python models/train/eval_valid_mmt.py --eval_path exp/Jan27-roberta-mix/noskip_lr_mix_all_E-xavier768d_L12_H768_det-sep_dp0.1_di0.1_step_lr5e-05_0.999_type_sd999 --ckpt model_best_seen.pth --gpu --max_high_fails 9 --max_fails 10 --eval_split valid_seen --eval_enable_feat_posture --num_threads 4 --name_temp eval_valid_seen
 python models/eval/eval_mmt.py --eval_path exp/Jan27-roberta-mix/noskip_lr_mix_all_E-xavier768d_L12_H768_det-sep_dp0.1_di0.1_step_lr5e-05_0.999_type_sd999 --ckpt model_best_seen.pth --gpu --max_high_fails 9 --max_fails 10 --eval_split valid_unseen --eval_enable_feat_posture --num_threads 4 --name_temp eval_valid_unseen
-```
-
-Leaderboard evaluation: 
-```bash
-python models/eval/leaderboard.py --eval_path exp/Jan27-roberta-mix/noskip_lr_mix_all_E-xavier768d_L12_H768_det-sep_dp0.1_di0.1_step_lr5e-05_0.999_type_sd999 --ckpt model_best_seen.pth --gpu --max_high_fails 10 --eval_enable_feat_posture --num_threads 4 --name_temp eval_test
 ```
 
 
